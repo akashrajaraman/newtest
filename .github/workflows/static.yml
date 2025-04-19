@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEBI-NISM Investor Awareness Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .timer-container {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .question-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .question {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .options label {
+            display: block;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .options label:hover {
+            background-color: #e9ecef;
+        }
+        .options input[type="radio"] {
+            margin-right: 10px;
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .submit-btn {
+            background-color: #27ae60;
+        }
+        .submit-btn:hover {
+            background-color: #219653;
+        }
+        .result-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        .score {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .correct {
+            color: #27ae60;
+        }
+        .wrong {
+            color: #e74c3c;
+        }
+        .question-result {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        .correct-answer {
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .user-answer {
+            font-weight: bold;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            height: 10px;
+            background-color: #3498db;
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .question-number {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SEBI-NISM Investor Awareness Quiz</h1>
+        <p>Test your knowledge of investment concepts, mutual funds, and regulatory frameworks</p>
+    </div>
+
+    <div class="timer-container">
+        Time Remaining: <span id="timer">40:00</span>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="question-number" id="questionNumber">
+        Question 1 of 25
+    </div>
+
+    <div id="quizContainer">
+        <div class="question-container">
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+        </div>
+        <div class="navigation">
+            <button id="prevBtn" disabled>Previous</button>
+            <button id="nextBtn">Next</button>
+            <button id="submitBtn" class="submit-btn" style="display: none;">Submit Quiz</button>
+        </div>
+    </div>
+
+    <div class="result-container" id="resultContainer">
+        <div class="result-header">
+            <h2>Quiz Results</h2>
+        </div>
+        <div class="score" id="score"></div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Quiz questions and answers
+        const quizData = [
+            {
+                question: "Which financial goal is typically considered long-term?",
+                options: {
+                    a: "Monthly grocery shopping",
+                    b: "Buying a mobile phone",
+                    c: "Saving for retirement",
+                    d: "Paying electricity bill"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which of the following does not impact your credit score?",
+                options: {
+                    a: "Loan repayment history",
+                    b: "Number of bank accounts",
+                    c: "Outstanding debts",
+                    d: "Credit utilization ratio"
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "What is the full form of IPO?",
+                options: {
+                    a: "Immediate Profit Option",
+                    b: "Initial Public Offering",
+                    c: "Internal Price Option",
+                    d: "Indexed Public Operation"
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "Which is a feature of a Public Provident Fund (PPF)?",
+                options: {
+                    a: "Lock-in of 5 years",
+                    b: "Taxable returns",
+                    c: "Lock-in of 15 years",
+                    d: "No interest paid"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which financial instrument is traded in the derivatives market?",
+                options: {
+                    a: "Fixed deposit",
+                    b: "Futures contract",
+                    c: "Savings account",
+                    d: "Sovereign gold bond"
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "Which of the following agencies maintains PAN card data?",
+                options: {
+                    a: "SEBI",
+                    b: "RBI",
+                    c: "NSDL",
+                    d: "IRDAI"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "What does 'Blue Chip' stock refer to?",
+                options: {
+                    a: "Risky start-up stocks",
+                    b: "Government bonds",
+                    c: "Large, financially sound companies",
+                    d: "Stocks traded on international exchanges"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which of the following represents ownership in a company?",
+                options: {
+                    a: "Fixed deposit",
+                    b: "Bond",
+                    c: "Equity share",
+                    d: "Recurring deposit"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "What is the main role of a depository in stock markets?",
+                options: {
+                    a: "Transfer funds",
+                    b: "Print share certificates",
+                    c: "Hold securities in dematerialized form",
+                    d: "Determine share price"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which section of the Income Tax Act covers tax-saving mutual funds (ELSS)?",
+                options: {
+                    a: "24",
+                    b: "10",
+                    c: "80C",
+                    d: "44AD"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which of the following best describes inflation?",
+                options: {
+                    a: "Rise in interest rates",
+                    b: "Fall in stock prices",
+                    c: "General rise in price levels",
+                    d: "Decrease in GDP"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "ULIPs combine investment with which financial product?",
+                options: {
+                    a: "Home loan",
+                    b: "Fixed deposit",
+                    c: "Insurance",
+                    d: "Gold ETF"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which one is not a regulated entity under SEBI?",
+                options: {
+                    a: "Stock broker",
+                    b: "Insurance agent",
+                    c: "Portfolio manager",
+                    d: "Mutual fund company"
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "Which of the following is a short-term investment option?",
+                options: {
+                    a: "Equity mutual fund",
+                    b: "PPF",
+                    c: "Treasury bill",
+                    d: "Real estate"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "What does 'asset allocation' mean?",
+                options: {
+                    a: "Tracking stock prices",
+                    b: "Splitting one stock into many",
+                    c: "Dividing investments across asset classes",
+                    d: "Investing only in foreign assets"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which of the following is a major risk in equity investing?",
+                options: {
+                    a: "Inflation risk",
+                    b: "Liquidity risk",
+                    c: "Market volatility",
+                    d: "Currency depreciation"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "The term 'bull market' refers to:",
+                options: {
+                    a: "Market moving sideways",
+                    b: "Declining stock prices",
+                    c: "Stable interest rates",
+                    d: "Rising stock prices"
+                },
+                correctAnswer: "d"
+            },
+            {
+                question: "Which of the following is not a type of insurance?",
+                options: {
+                    a: "Term life insurance",
+                    b: "Health insurance",
+                    c: "Vehicle insurance",
+                    d: "Income tax insurance"
+                },
+                correctAnswer: "d"
+            },
+            {
+                question: "Which document lists all transactions in a demat account?",
+                options: {
+                    a: "Contract note",
+                    b: "Holding statement",
+                    c: "Debit note",
+                    d: "Credit report"
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "Who is the regulatory authority for pension funds in India?",
+                options: {
+                    a: "SEBI",
+                    b: "RBI",
+                    c: "PFRDA",
+                    d: "NABARD"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which product helps in diversification and is traded like a stock?",
+                options: {
+                    a: "ELSS",
+                    b: "NPS",
+                    c: "ETF",
+                    d: "PPF"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "In mutual funds, 'exit load' refers to:",
+                options: {
+                    a: "Entry tax",
+                    b: "Fee for switching schemes",
+                    c: "Penalty for early withdrawal",
+                    d: "Tax on capital gains"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which of the following provides guaranteed returns?",
+                options: {
+                    a: "Equity mutual funds",
+                    b: "Savings account",
+                    c: "Government bonds (on maturity)",
+                    d: "Equity-linked insurance"
+                },
+                correctAnswer: "c"
+            },
+            {
+                question: "Which of the following is issued by the RBI?",
+                options: {
+                    a: "Commercial papers",
+                    b: "Treasury bills",
+                    c: "Preference shares",
+                    d: "Equity funds"
+                },
+                correctAnswer: "b"
+            },
+            {
+                question: "Which of these represents a liability for an individual?",
+                options: {
+                    a: "Bank FD",
+                    b: "Home loan",
+                    c: "Mutual fund investment",
+                    d: "Shares held"
+                },
+                correctAnswer: "b"
+            }
+        ];
+
+        // Quiz variables
+        let currentQuestion = 0;
+        let userAnswers = new Array(quizData.length).fill(null);
+        let timer;
+        let timeLeft = 40 * 60; // 40 minutes in seconds
+
+        // DOM elements
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        const questionNumberEl = document.getElementById('questionNumber');
+        const progressBarEl = document.getElementById('progressBar');
+        const timerEl = document.getElementById('timer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const quizContainer = document.getElementById('quizContainer');
+        const resultContainer = document.getElementById('resultContainer');
+        const scoreEl = document.getElementById('score');
+        const resultsEl = document.getElementById('results');
+
+        // Initialize quiz
+        function loadQuestion() {
+            const question = quizData[currentQuestion];
+            questionEl.textContent = question.question;
+            optionsEl.innerHTML = '';
+            
+            for (const [key, value] of Object.entries(question.options)) {
+                const label = document.createElement('label');
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'option';
+                radio.value = key;
+                radio.checked = userAnswers[currentQuestion] === key;
+                
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(` ${key.toUpperCase()}. ${value}`));
+                optionsEl.appendChild(label);
+            }
+            
+            questionNumberEl.textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+            progressBarEl.style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+            
+            // Update button states
+            prevBtn.disabled = currentQuestion === 0;
+            nextBtn.disabled = false;
+            
+            if (currentQuestion === quizData.length - 1) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'block';
+            } else {
+                nextBtn.style.display = 'block';
+                submitBtn.style.display = 'none';
+            }
+        }
+
+        // Start timer
+        function startTimer() {
+            timer = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    submitQuiz();
+                }
+            }, 1000);
+        }
+
+        // Save answer
+        function saveAnswer() {
+            const selectedOption = document.querySelector('input[name="option"]:checked');
+            if (selectedOption) {
+                userAnswers[currentQuestion] = selectedOption.value;
+            }
+        }
+
+        // Navigation
+        prevBtn.addEventListener('click', () => {
+            saveAnswer();
+            currentQuestion--;
+            loadQuestion();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            saveAnswer();
+            currentQuestion++;
+            loadQuestion();
+        });
+
+        // Submit quiz
+        submitBtn.addEventListener('click', submitQuiz);
+
+        function submitQuiz() {
+            clearInterval(timer);
+            saveAnswer();
+            
+            // Calculate score
+            let score = 0;
+            quizData.forEach((question, index) => {
+                if (userAnswers[index] === question.correctAnswer) {
+                    score++;
+                }
+            });
+            
+            // Display results
+            quizContainer.style.display = 'none';
+            resultContainer.style.display = 'block';
+            
+            scoreEl.innerHTML = `You scored <span class="${score >= quizData.length / 2 ? 'correct' : 'wrong'}">${score} out of ${quizData.length}</span>`;
+            
+            // Show detailed results
+            resultsEl.innerHTML = '';
+            quizData.forEach((question, index) => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'question-result';
+                
+                const questionText = document.createElement('p');
+                questionText.textContent = `${index + 1}. ${question.question}`;
+                resultDiv.appendChild(questionText);
+                
+                const correctAnswer = document.createElement('p');
+                correctAnswer.innerHTML = `<span class="correct-answer">Correct answer: ${question.correctAnswer.toUpperCase()}. ${question.options[question.correctAnswer]}</span>`;
+                resultDiv.appendChild(correctAnswer);
+                
+                if (userAnswers[index]) {
+                    const userAnswer = document.createElement('p');
+                    const isCorrect = userAnswers[index] === question.correctAnswer;
+                    userAnswer.innerHTML = `<span class="user-answer ${isCorrect ? 'correct' : 'wrong'}">Your answer: ${userAnswers[index].toUpperCase()}. ${question.options[userAnswers[index]]}</span>`;
+                    resultDiv.appendChild(userAnswer);
+                } else {
+                    const noAnswer = document.createElement('p');
+                    noAnswer.innerHTML = '<span class="wrong">You did not answer this question</span>';
+                    resultDiv.appendChild(noAnswer);
+                }
+                
+                resultsEl.appendChild(resultDiv);
+            });
+        }
+
+        // Start the quiz
+        loadQuestion();
+        startTimer();
+    </script>
+</body>
+</html>
